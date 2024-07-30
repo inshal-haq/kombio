@@ -1,56 +1,83 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import Player from "../models/player";
 
-import negativeOneCard from "../assets/-1-card.svg";
-import zeroCard from "../assets/0-card.svg";
-import oneCard from "../assets/1-card.svg";
-import twoCard from "../assets/2-card.svg";
-import threeCard from "../assets/3-card.svg";
-import fourCard from "../assets/4-card.svg";
-import fiveCard from "../assets/5-card.svg";
-import sixCard from "../assets/6-card.svg";
-import sevenCard from "../assets/7-card.svg";
-import eightCard from "../assets/8-card.svg";
-import nineCard from "../assets/9-card.svg";
-import tenCard from "../assets/10-card.svg";
-import elevenCard from "../assets/11-card.svg";
-import twelveCard from "../assets/12-card.svg";
-import thirteenCard from "../assets/13-card.svg";
-import fourteenCard from "../assets/14-card.svg";
-import backCard from "../assets/back-card.svg";
+import deckImage from "../assets/deck.svg";
+import PlayerItem from "../components/PlayerItem";
+
+const KOMBIO_CARDS: number[] = [
+  -1, -1, -1, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4,
+  4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9,
+  10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 13, 13, 14, 14,
+];
+const PLAYERS: Player[] = [];
+// const DISCARDED_CARDS: number[] = [];
 
 const Game: React.FC = () => {
+  const [deck, setDeck] = useState(KOMBIO_CARDS);
+  const [players, setPlayers] = useState(PLAYERS);
+  const numOfPlayers = 3;
+
+  function getCard(localDeck: number[]) {
+    const index = Math.floor(Math.random() * localDeck.length);
+    const card = localDeck[index];
+    const updatedDeck = [
+      ...localDeck.slice(0, index),
+      ...localDeck.slice(index + 1),
+    ];
+    return { card, updatedDeck };
+  }
+
+  function handOutCards() {
+    let localDeck = deck;
+    const updatedPlayers = [];
+
+    for (let i = 1; i <= numOfPlayers; i++) {
+      const newPlayer = new Player(`Player ${i}`, []);
+
+      for (let j = 1; j <= 4; j++) {
+        const result = getCard(localDeck);
+        newPlayer.hand.push(result.card);
+        localDeck = result.updatedDeck;
+      }
+
+      updatedPlayers.push(newPlayer);
+    }
+
+    setDeck(localDeck);
+    setPlayers(updatedPlayers);
+  }
+
+  console.log("deck:", deck);
+
   return (
     <main className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-slate-500">
-      <h1 className="px-4 py-2 text-2xl text-neutral-200">Game Page</h1>
-      <Link
-        to="/"
+      <button
         className="cursor-pointer rounded-md bg-zinc-700 px-4 py-2 text-2xl text-neutral-200 hover:bg-zinc-200 hover:text-neutral-700"
+        onClick={handOutCards}
       >
-        Back Home
-      </Link>
-      <div className="flex flex-col gap-4">
-        <div className="flex gap-4">
-          <img src={negativeOneCard} alt="Negative One Card" />
-          <img src={zeroCard} alt="Zero Card" />
-          <img src={oneCard} alt="One Card" />
-          <img src={twoCard} alt="Two Card" />
-          <img src={threeCard} alt="Three Card" />
-          <img src={fourCard} alt="Four Card" />
-          <img src={fiveCard} alt="Five Card" />
-          <img src={sixCard} alt="Six Card" />
+        Hand Out Cards
+      </button>
+      <section className="flex items-start justify-center gap-8">
+        <div className="flex flex-col gap-4">
+          <div>Pile</div>
+          <div className="h-[135px] w-[90px] rounded-lg border border-white"></div>
         </div>
-        <div className="flex gap-4">
-          <img src={sevenCard} alt="Seven Card" />
-          <img src={eightCard} alt="Eight Card" />
-          <img src={nineCard} alt="Nine Card" />
-          <img src={tenCard} alt="Ten Card" />
-          <img src={elevenCard} alt="Eleven Card" />
-          <img src={twelveCard} alt="Twelve Card" />
-          <img src={thirteenCard} alt="Thirteen Card" />
-          <img src={fourteenCard} alt="Fourteen Card" />
-          <img src={backCard} alt="Back of Card" />
+        <div className="flex flex-col gap-2">
+          <div>Deck</div>
+          <img
+            src={deckImage}
+            alt="deck"
+            className="cursor-pointer transition-all hover:-translate-y-1 hover:translate-x-1"
+          />
         </div>
-      </div>
+      </section>
+      <section>
+        <ul>
+          {players.map((player) => (
+            <PlayerItem key={player.id} player={player} />
+          ))}
+        </ul>
+      </section>
     </main>
   );
 };

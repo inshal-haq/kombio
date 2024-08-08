@@ -50,7 +50,7 @@ const Game: React.FC = () => {
   console.log("deck:", deck);
 
   return (
-    <main className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-slate-500">
+    <main className="flex w-full flex-col items-center justify-center gap-4 bg-slate-500">
       <button
         className="cursor-pointer rounded-md bg-zinc-700 px-4 py-2 text-2xl text-neutral-200 hover:bg-zinc-200 hover:text-neutral-700"
         onClick={handOutCards}
